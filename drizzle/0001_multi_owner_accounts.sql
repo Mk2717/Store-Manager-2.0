@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS `tenants` (`id` text PRIMARY KEY NOT NULL,`owner_email` text NOT NULL UNIQUE,`owner_name` text NOT NULL,`store_name` text NOT NULL,`logo` text NOT NULL DEFAULT '',`profile_complete` integer NOT NULL DEFAULT 0,`created_at` text NOT NULL,`updated_at` text NOT NULL);
+CREATE TABLE IF NOT EXISTS `tenant_members` (`id` text PRIMARY KEY NOT NULL,`tenant_id` text NOT NULL,`email` text NOT NULL UNIQUE,`name` text NOT NULL,`role` text NOT NULL,`status` text NOT NULL DEFAULT 'Active',`created_at` text NOT NULL,`updated_at` text NOT NULL);
+CREATE INDEX IF NOT EXISTS `tenant_members_tenant_idx` ON `tenant_members` (`tenant_id`);
+CREATE TABLE IF NOT EXISTS `audit_events` (`id` text PRIMARY KEY NOT NULL,`tenant_id` text NOT NULL,`actor_email` text NOT NULL,`action` text NOT NULL,`detail` text NOT NULL,`created_at` text NOT NULL);

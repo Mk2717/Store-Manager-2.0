@@ -1,0 +1,1 @@
+import type {MetadataRoute} from "next";export default function manifest():MetadataRoute.Manifest{return{name:"Store Manager",short_name:"Store Manager",start_url:"/",display:"fullscreen",background_color:"#f6f7f4",theme_color:"#145c3c",icons:[{src:"/favicon.svg",sizes:"any",type:"image/svg+xml"}]}}
