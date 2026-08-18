@@ -74,3 +74,22 @@ test("inventory navigation counts all products and POS cards keep readable detai
   assert.match(styles,/button>em\{[^}]*color:#ffd447!important/);
   assert.doesNotMatch(worker,/CREATE TABLE IF NOT EXISTS/);
 });
+
+test("sales and inventory persistence cannot regress to stale quick snapshots",async()=>{
+  const worker=await readFile(new URL("../worker/index.ts",import.meta.url),"utf8");
+  assert.match(worker,/storedItems=records\(state\.items\)/);
+  assert.match(worker,/items:\[\.\.\.storedItems,\.\.\.quickOnly\]/);
+  assert.doesNotMatch(worker,/items:\[\.\.\.quickItems,\.\.\.storedItems\.filter/);
+  assert.match(worker,/DELETE FROM quick_inventory_items WHERE tenant_id=\?/);
+  assert.match(worker,/Quick multi-item intake/);
+});
+
+test("state sync merges concurrent sales and posts cashier stock deductions on the server",async()=>{
+  const worker=await readFile(new URL("../worker/index.ts",import.meta.url),"utf8");
+  assert.match(worker,/baseUpdatedAt\?:string\|null;reconcile\?:boolean/);
+  assert.match(worker,/payload\.baseUpdatedAt!==current\.updatedAt/);
+  assert.match(worker,/mergeRecords\(currentSales,incomingSales,true\)/);
+  assert.match(worker,/applyCashierSales\(current\.state\.items,newSales\)/);
+  assert.match(worker,/Server-posted cashier sale/);
+  assert.match(worker,/sync\.state_merged/);
+});
