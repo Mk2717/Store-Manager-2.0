@@ -53,12 +53,15 @@ test("shows the email account entry screen without compulsory ChatGPT sign-in",a
   assert.doesNotMatch(html,/signin-with-chatgpt\?return_to/);
 });
 
-test("quick intake writes the saved cloud state into the dashboard inventory cache",async()=>{
+test("quick intake and startup recovery write safe cloud state into the dashboard cache",async()=>{
   const source=await readFile(new URL("../app/dashboard-shell.tsx",import.meta.url),"utf8");
   assert.match(source,/mode==="inventory"\?"\/api\/quick-inventory":"\/api\/state"/);
   assert.match(source,/writeDashboardState\(\(saveData\.state\|\|current\)/);
   assert.match(source,/liveResponse\.ok&&liveData\.state/);
   assert.match(source,/objectStore\("state"\)\.put\(state,"main"\)/);
+  assert.match(source,/readDashboardState\(\)/);
+  assert.match(source,/hasRecoverableLocalState\(localState,resolved\)/);
+  assert.match(source,/reconcile:true/);
 });
 
 test("inventory navigation counts all products and POS cards keep readable details below images",async()=>{
